@@ -19,11 +19,14 @@ public class TinyUrlService extends TinyUrlServiceGrpc.TinyUrlServiceImplBase {
         this.redisRepository = redisRepository;
     }
 
+    @Autowired
+    private BaseN base63;
+
     @Override
     public void getMini(GetMiniRequest request, StreamObserver<GetMiniResponse> responseObserver) {
         String miniUrl = ofNullable(redisRepository.getShortUrlByOriginalUrl(request.getOriginalUrl()))
                 .orElseGet(() -> {
-                    String newMiniUrl = Base63.longToBase63(redisRepository.generateId());
+                    String newMiniUrl = base63.longToBaseN(redisRepository.generateId());
                     redisRepository.add(new Url(newMiniUrl, request.getOriginalUrl()));
                     return newMiniUrl;
                 });

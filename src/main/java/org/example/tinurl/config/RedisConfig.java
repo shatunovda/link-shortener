@@ -3,8 +3,10 @@ package org.example.tinurl.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -16,10 +18,15 @@ public class RedisConfig {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
+    private Environment env;
 
     @Bean
     LettuceConnectionFactory lettuceConnectionFactory() {
-        return new LettuceConnectionFactory();
+        RedisStandaloneConfiguration redisConf = new RedisStandaloneConfiguration();
+        redisConf.setHostName(env.getProperty("spring.redis.host"));
+        redisConf.setPort(Integer.parseInt(env.getProperty("spring.redis.port")));
+        return new LettuceConnectionFactory(redisConf);
     }
 
     @Bean

@@ -13,10 +13,12 @@ plugins {
     id 'java'
     id 'com.google.protobuf' version "0.8.10"
     id "com.avast.gradle.docker-compose" version "0.13.0"
+    id "com.palantir.docker" version "0.25.0"
+    id "com.palantir.git-version" version "0.12.3"
 }
 
 group = 'com.shortener'
-version = '0.0.1-SNAPSHOT'
+version gitVersion()
 sourceCompatibility = '14'
 
 configurations {
@@ -105,3 +107,15 @@ dockerCompose {
 
 dockerCompose.isRequiredBy(integrationTest)
 
+def dockerRegistry = project.hasProperty('dockerRegistry') ? "$project.dockerRegistry/" : ''
+def dockerImage = "$dockerRegistry$name:$version"
+
+docker {
+    name dockerImage
+    tag 'latest', 'local:latest'
+    dockerfile file('Dockerfile')
+    files tasks.bootJar.outputs.files
+    buildArgs ([ JAR_FILE: bootJar.archiveFileName.get()])
+}
+
+docker.dependsOn bootJar

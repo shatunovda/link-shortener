@@ -1,12 +1,17 @@
 version: "3.2"
 services:
-
   redis:
-    image: "redis:alpine"
+    image: redis
     ports:
       - "6379:6379"
-    volumes:
-      - $PWD/redis-data:/var/lib/redis
-      - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+
+  shortener:
+    image: "local:latest"
     environment:
       - REDIS_REPLICATION_MODE=master
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    ports:
+      - "6565:6565"
+    depends_on:
+      - redis
