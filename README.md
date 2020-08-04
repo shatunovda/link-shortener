@@ -1,4 +1,4 @@
-# URL Shorter 
+# URL Shortener 
 
 for local start in Docker use:
 
